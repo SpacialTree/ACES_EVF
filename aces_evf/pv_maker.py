@@ -10,45 +10,51 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 from astropy.visualization import simple_norm
+import spectral_cube
+from spectral_cube import SpectralCube
+
+save_path = '/orange/adamginsburg/ACES/broadline_sources/EVFs/images/'
+
+def make_position_list(amin, amax, step, unit):
+    return (np.arange(amin.to(unit).value, amax.to(unit).value+1, step.value)*unit).to(u.deg)
+
+def make_subcube():
+    print('ok')
 
 def main():
-    cube_fn = '/orange/adamginsburg/ACES/mosaics/cubes/CS_CubeMosaic.fits'
+    basepath = '/orange/adamginsburg/ACES/mosaics/cubes/'
+    cube_fn = f'{basepath}/CS_CubeMosaic.fits'
     mol = cube_fn.split('/')[-1].split('_')[0]
-    cube = fits.open(cube_fn)
-    wcs = WCS(cube[0].header)
-    cube_data = cube[0].data
+    cube = SpectralCube.read(cube_fn)
     
     # Latitude
     b_min = -0.27*u.deg
     b_max = 0.22*u.deg
-    list_b = np.arange(b_min.to(u.arcmin).value, b_max.to(u.arcmin).value+1, 1)*u.arcmin
-    list_b = list_b.to(u.deg)
+    list_b = make_position_list(b_min, b_max, 0.5*u.arcmin, u.arcmin)
 
     # Longitude
     l_min = -0.59*u.deg
     l_max = 0.88*u.deg
-    list_l = np.arange(l_min.to(u.arcmin).value, l_max.to(u.arcmin).value+1, 1)*u.arcmin
-    list_l = list_l.to(u.deg)
+    list_l = make_position_list(l_min, l_max, 0.5*u.arcmin, u.arcmin)
 
-    # Make PV diagrams across all longitudes
-    for i in range(len(list_l)):
-        l = list_l[i]
-        c1 = SkyCoord(l, b_min, frame='galactic')
-        c2 = SkyCoord(l, b_max, frame='galactic')
-        path = Path([c1, c2], width=1*u.arcmin)
-        pv = extract_pv_slice(cube_data, path, wcs)
-        pv.writeto(f'pv_{mol}_l{l.value}.fits', overwrite=True)
+    for b in list_b:
+        reg = regions.RectangleSkyRegion(center=SkyCoord((l_min+l_max)/2., b, frame='galactic'), width=1.5*u.deg, height=1*u.arcmin)
+        #reg.to_pixel(WCS(head)).plot(ax=ax, edgecolor='red', facecolor='none')
+        subcube = cube.subcube_from_regions([reg])
+        pv_mean = subcube.mean(axis=1)
+        pv_mean.save(f'{save_path}/{mol}_pv_b{round(b.value, 3)}_mean.fits')
+        pv_max = subcube.max(axis=1)
+        pv_max.save(f'{save_path}/{mol}_pv_b{round(b.value, 3)}_max.fits')
 
-    # Make PV diagrams across all latitudes
-    for i in range(len(list_b)):
-        b = list_b[i]
-        c1 = SkyCoord(l_min, b, frame='galactic')
-        c2 = SkyCoord(l_max, b, frame='galactic')
-        path = Path([c1, c2], width=1*u.arcmin)
-        pv = extract_pv_slice(cube_data, path, wcs)
-        pv.writeto(f'pv_{mol}_b{b.value}.fits', overwrite=True)
+    for l in list_l:
+        reg = regions.RectangleSkyRegion(center=SkyCoord(l, (b_min+b_max)/2., frame='galactic'), width=1*u.arcmin, height=0.5*u.deg)
+        #reg.to_pixel(WCS(head)).plot(ax=ax, edgecolor='red', facecolor='none')
+        subcube = cube.subcube_from_regions([reg])
+        pv_mean = subcube.mean(axis=2)
+        pv_mean.save(f'{save_path}/{mol}_pv_l{round(l.value, 3)}_mean.fits')
+        pv_max = subcube.max(axis=2)
+        pv_max.save(f'{save_path}/{mol}_pv_l{round(l.value, 3)}_max.fits')
 
-    
 
 if __name__ == "__main__":
     main()#sys.argv[1])
