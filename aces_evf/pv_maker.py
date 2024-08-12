@@ -18,9 +18,6 @@ save_path = '/orange/adamginsburg/ACES/broadline_sources/EVFs/images/'
 def make_position_list(amin, amax, step, unit):
     return (np.arange(amin.to(unit).value, amax.to(unit).value+1, step.value)*unit).to(u.deg)
 
-def make_subcube():
-    print('ok')
-
 def main():
     basepath = '/orange/adamginsburg/ACES/mosaics/cubes/'
     cube_fn = f'{basepath}/CS_CubeMosaic.fits'
