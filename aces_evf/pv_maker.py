@@ -121,14 +121,14 @@ def plot_pv(pv, mol, pos, longitude=True, mean='mean', close=True):
 
     if longitude:
         ax.set_xlabel('Latitude (deg)')
-        ax.set_title(f'{mol} {mean} PV diagram at l={pos.value}')
+        ax.set_title(f'{mol} {mean} PV diagram at l={round(pos.value, 3)}')
         plt.tight_layout()
-        plt.savefig(f'{save_path}/{mol}_{mean}_pv_l{pos.value}.png')
+        plt.savefig(f'{save_path}/{mol}_{mean}_pv_l{round(pos.value, 3)}.png', overwrite=True)
     else:
         ax.set_xlabel('Longitude (deg)')
-        ax.set_title(f'{mol} {mean} PV diagram at b={pos.value}')
+        ax.set_title(f'{mol} {mean} PV diagram at b={round(pos.value, 3)}')
         plt.tight_layout()
-        plt.savefig(f'{save_path}/{mol}_{mean}_pv_b{pos.value}.png')
+        plt.savefig(f'{save_path}/{mol}_{mean}_pv_b{round(pos.value, 3)}.png', overwrite=True)
     if close:
         plt.close()
 
