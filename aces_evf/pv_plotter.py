@@ -1,4 +1,8 @@
-
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.io import fits
+from astropy import units as u
+from pv_plotter import plot_pv
 from pv_maker import make_position_list
 
 # Path to where to save the PV diagrams
@@ -16,14 +20,20 @@ def plot_all_pvb(opt='max'):
     list_b = make_position_list(B_MIN, B_MAX)
     for pos in list_b:
         pv_fn = f'{save_path}/CS21_pv_b{round(pos.value, 3)}_{opt}.fits'
-        pv1 = fits.open(pv_fn)
+        try:
+            pv1 = fits.open(pv_fn)
+        except FileNotFoundError:
+            return False
         plot_pv(pv1[0], 'CS21', pos, longitude=False, mean=opt, close=True)
 
 def plot_all_pvl(opt='max'):
     list_l = make_position_list(L_MIN, L_MAX)
     for pos in list_l:
         pv_fn = f'{save_path}/CS21_pv_l{round(pos.value, 3)}_{opt}.fits'
-        pv1 = fits.open(pv_fn)
+        try:
+            pv1 = fits.open(pv_fn)
+        except FileNotFoundError:
+            return False
         plot_pv(pv1[0], 'CS21', pos, longitude=True, mean=opt, close=True)
 
 def main():
