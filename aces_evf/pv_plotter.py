@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy import units as u
+from astropy.wcs import WCS
+
 from pv_maker import make_position_list
 
 # Path to where to save the PV diagrams
@@ -45,18 +47,19 @@ def plot_pv(pv, mol, pos, longitude=True, mean='mean', close=True):
         ax.set_xlabel('Latitude (deg)')
         ax.set_title(f'{mol} {mean} PV diagram at l={round(pos.value, 3)}')
         plt.tight_layout()
-        plt.savefig(f'{save_path}/{mol}_{mean}_pv_l{round(pos.value, 3)}.png', overwrite=True)
+        plt.savefig(f'{save_path}/{mol}_{mean}_pv_l{round(pos.value, 3)}.png')
     else:
         ax.set_xlabel('Longitude (deg)')
         ax.set_title(f'{mol} {mean} PV diagram at b={round(pos.value, 3)}')
         plt.tight_layout()
-        plt.savefig(f'{save_path}/{mol}_{mean}_pv_b{round(pos.value, 3)}.png', overwrite=True)
+        plt.savefig(f'{save_path}/{mol}_{mean}_pv_b{round(pos.value, 3)}.png')
     if close:
         plt.close()
 
 def plot_all_pvb(opt='max'):
     list_b = make_position_list(B_MIN, B_MAX)
     for pos in list_b:
+        print(f'Plotting position b={pos}')
         pv_fn = f'{save_path}/CS21_pv_b{round(pos.value, 3)}_{opt}.fits'
         try:
             pv1 = fits.open(pv_fn)
@@ -67,6 +70,7 @@ def plot_all_pvb(opt='max'):
 def plot_all_pvl(opt='max'):
     list_l = make_position_list(L_MIN, L_MAX)
     for pos in list_l:
+        print(f'Plotting position l={pos}')
         pv_fn = f'{save_path}/CS21_pv_l{round(pos.value, 3)}_{opt}.fits'
         try:
             pv1 = fits.open(pv_fn)
