@@ -16,7 +16,7 @@ import regions
 from regions import Regions
 
 # Path to where to save the PV diagrams
-save_path = '/orange/adamginsburg/ACES/broadline_sources/EVFs/images/'
+save_path = '/orange/adamginsburg/ACES/broadline_sources/EVFs/images/HNCO/'
 
 # Latitude extrema
 B_MIN = -0.27 * u.deg
@@ -119,9 +119,11 @@ def make_pv_mol(cube_fn):
 
 def main():
     basepath = '/orange/adamginsburg/ACES/mosaics/cubes/'
-    cube_fn_CS = f'{basepath}/CS21_CubeMosaic.fits'
+    #cube_fn_CS = f'{basepath}/CS21_CubeMosaic.fits'
+    #make_pv_mol(cube_fn_CS)
 
-    make_pv_mol(cube_fn_CS)
+    cube_fn_HNCO = f'{basepath}/HNCO_7m12mTP_CubeMosaic.fits'
+    make_pv_mol(cube_fn_HNCO)
 
 
 if __name__ == "__main__":
