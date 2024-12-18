@@ -66,21 +66,23 @@ def make_pv_b(cube, latitude, mol):
     subcube = cube.subcube_from_regions([reg])
     subcube.allow_huge_operations = True
 
-    t = time.process_time()
-    pv_mean = subcube.mean(axis=1)
-    print(f'Time to calculate mean: {time.process_time() - t}')
+    with subcube.use_dask_scheduler('threads', num_workers=4):
 
-    t = time.process_time()
-    pv_mean.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_mean.fits', overwrite=True)
-    print(f'Time to write mean: {time.process_time() - t}')
+        t = time.process_time()
+        pv_mean = subcube.mean(axis=1)
+        print(f'Time to calculate mean: {time.process_time() - t}')
 
-    t = time.process_time()
-    pv_max = subcube.max(axis=1)
-    print(f'Time to calculate max: {time.process_time() - t}')
+        t = time.process_time()
+        pv_mean.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_mean.fits', overwrite=True)
+        print(f'Time to write mean: {time.process_time() - t}')
 
-    t = time.process_time()
-    pv_max.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_max.fits', overwrite=True)
-    print(f'Time to write max: {time.process_time() - t}')
+        t = time.process_time()
+        pv_max = subcube.max(axis=1)
+        print(f'Time to calculate max: {time.process_time() - t}')
+
+        t = time.process_time()
+        pv_max.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_max.fits', overwrite=True)
+        print(f'Time to write max: {time.process_time() - t}')
 
     print('Done with b =', latitude)
 
@@ -103,21 +105,23 @@ def make_pv_l(cube, longitude, mol):
     subcube = cube.subcube_from_regions([reg])
     subcube.allow_huge_operations = True
 
-    t = time.process_time()
-    pv_mean = subcube.mean(axis=2)
-    print(f'Time to calculate mean: {time.process_time() - t}')
+    with subcube.use_dask_scheduler('threads', num_workers=4):
 
-    t = time.process_time()
-    pv_mean.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_mean.fits', overwrite=True)
-    print(f'Time to write mean: {time.process_time() - t}')
+        t = time.process_time()
+        pv_mean = subcube.mean(axis=2)
+        print(f'Time to calculate mean: {time.process_time() - t}')
 
-    t = time.process_time()
-    pv_max = subcube.max(axis=2)
-    print(f'Time to calculate max: {time.process_time() - t}')
+        t = time.process_time()
+        pv_mean.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_mean.fits', overwrite=True)
+        print(f'Time to write mean: {time.process_time() - t}')
 
-    t = time.process_time()
-    pv_max.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_max.fits', overwrite=True)
-    print(f'Time to write max: {time.process_time() - t}')
+        t = time.process_time()
+        pv_max = subcube.max(axis=2)
+        print(f'Time to calculate max: {time.process_time() - t}')
+
+        t = time.process_time()
+        pv_max.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_max.fits', overwrite=True)
+        print(f'Time to write max: {time.process_time() - t}')
 
     print('Done with l =', longitude)
 
@@ -131,14 +135,16 @@ def make_pv_mol(cube_fn):
         Path to the fits file of the cube.
     """
 
+    t = time.process_time()
     cube = SpectralCube.read(cube_fn, use_dask=True)
-    cube.use_dask_scheduler('threads', num_workers=4)
-    cube.rechunk(save_to_tmp_dir=True)
+    print(f'Time to read cube: {time.process_time() - t}')
+    #cube.use_dask_scheduler('threads', num_workers=4)
     mol = cube_fn.split('/')[-1].split('_')[0]
 
     list_b = make_position_list(B_MIN, B_MAX)
     list_l = make_position_list(L_MIN, L_MAX)
 
+    print('Starting PV diagrams for', mol)
     for latitude in list_b:
         print('Making PV diagram at b =', latitude)
         make_pv_b(cube, latitude, mol)
