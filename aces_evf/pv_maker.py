@@ -153,6 +153,7 @@ def main():
     #cube_fn_CS = f'{basepath}/CS21_CubeMosaic.fits'
     #make_pv_mol(cube_fn_CS)
 
+    print('Starting HNCO')
     cube_fn_HNCO = f'{basepath}/HNCO_7m12mTP_CubeMosaic.fits'
     make_pv_mol(cube_fn_HNCO)
 
