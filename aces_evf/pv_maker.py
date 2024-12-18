@@ -66,6 +66,10 @@ def make_pv_b(cube, latitude, mol):
     subcube = cube.subcube_from_regions([reg])
     subcube.allow_huge_operations = True
 
+    t = time.process_time()
+    subcube.rechunk(save_to_tmp_dir=True)
+    print(f'Time to rechunk: {time.process_time() - t}')
+
     with subcube.use_dask_scheduler('threads', num_workers=4):
 
         t = time.process_time()
@@ -105,6 +109,10 @@ def make_pv_l(cube, longitude, mol):
     subcube = cube.subcube_from_regions([reg])
     subcube.allow_huge_operations = True
 
+    t = time.process_time()
+    subcube.rechunk(save_to_tmp_dir=True)
+    print(f'Time to rechunk: {time.process_time() - t}')
+
     with subcube.use_dask_scheduler('threads', num_workers=4):
 
         t = time.process_time()
@@ -124,6 +132,60 @@ def make_pv_l(cube, longitude, mol):
         print(f'Time to write max: {time.process_time() - t}')
 
     print('Done with l =', longitude)
+
+def make_pv(cube, position, mol, axis):
+    """ 
+    Make a PV diagram along a given axis.
+
+    Parameters
+    ----------
+    cube : SpectralCube
+        SpectralCube object of the data.
+    position : Quantity
+        Position of the center of the region.
+    mol : str
+        Molecule name.
+    axis : int
+        Axis along which to make the PV diagram. 
+        1 for Galactic Latitude "b", 2 for Galactic Longitude "l".
+    """
+
+    if axis == 1:
+        pv_axis = 'b'
+        reg = regions.RectangleSkyRegion(center=SkyCoord((L_MIN + L_MAX) / 2., position, frame='galactic'), width=1.5 * u.deg, height=1 * u.arcmin)
+    elif axis == 2:
+        pv_axis = 'l'
+        reg = regions.RectangleSkyRegion(center=SkyCoord(position, (B_MIN + B_MAX) / 2., frame='galactic'), width=1 * u.arcmin, height=0.5 * u.deg)
+    else:
+        print('Invalid axis')
+        return
+
+    subcube = cube.subcube_from_regions([reg])
+    subcube.allow_huge_operations = True
+
+    t = time.process_time()
+    subcube.rechunk(save_to_tmp_dir=True)
+    print(f'Time to rechunk: {time.process_time() - t}')
+
+    with subcube.use_dask_scheduler('threads', num_workers=4):
+        
+        t = time.process_time()
+        pv_mean = subcube.mean(axis=axis)
+        print(f'Time to calculate mean: {time.process_time() - t}')
+
+        t = time.process_time()
+        pv_mean.write(f'{save_path}/{mol}_pv_{pv_axis}{round(position.value, 3)}_mean.fits', overwrite=True)
+        print(f'Time to write mean: {time.process_time() - t}')
+
+        t = time.process_time()
+        pv_max = subcube.max(axis=axis)
+        print(f'Time to calculate max: {time.process_time() - t}')
+
+        t = time.process_time()
+        pv_max.write(f'{save_path}/{mol}_pv_{pv_axis}{round(position.value, 3)}_max.fits', overwrite=True)
+        print(f'Time to write max: {time.process_time() - t}')
+
+    print(f'Done with {pv_axis} =', position)
 
 def make_pv_mol(cube_fn):
     """
@@ -147,11 +209,11 @@ def make_pv_mol(cube_fn):
     print('Starting PV diagrams for', mol)
     for latitude in list_b:
         print('Making PV diagram at b =', latitude)
-        make_pv_b(cube, latitude, mol)
+        make_pv(cube, latitude, mol, 1)
 
     for longitude in list_l:
         print('Making PV diagram at l =', longitude)
-        make_pv_l(cube, longitude, mol)
+        make_pv(cube, longitude, mol, 2)
 
 
 def main():
