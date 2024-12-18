@@ -163,9 +163,9 @@ def make_pv(cube, position, mol, axis):
     subcube = cube.subcube_from_regions([reg])
     subcube.allow_huge_operations = True
 
-    t = time.process_time()
-    subcube.rechunk(save_to_tmp_dir=True)
-    print(f'Time to rechunk: {time.process_time() - t}')
+    #t = time.process_time()
+    #subcube.rechunk(save_to_tmp_dir=True)
+    #print(f'Time to rechunk: {time.process_time() - t}')
 
     with subcube.use_dask_scheduler('threads', num_workers=4):
         
