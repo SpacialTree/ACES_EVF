@@ -133,6 +133,7 @@ def make_pv_mol(cube_fn):
 
     cube = SpectralCube.read(cube_fn, use_dask=True)
     cube.use_dask_scheduler('threads', num_workers=4)
+    cube.rechunk(save_to_tmp_dir=True)
     mol = cube_fn.split('/')[-1].split('_')[0]
 
     list_b = make_position_list(B_MIN, B_MAX)
