@@ -67,7 +67,7 @@ def make_pv_b(cube, latitude, mol):
     subcube.allow_huge_operations = True
 
     t = time.process_time()
-    pv_mean = subcube.mean(axis=1, save_to_tmp_dir=True)
+    pv_mean = subcube.mean(axis=1)
     print(f'Time to calculate mean: {time.process_time() - t}')
 
     t = time.process_time()
@@ -75,7 +75,7 @@ def make_pv_b(cube, latitude, mol):
     print(f'Time to write mean: {time.process_time() - t}')
 
     t = time.process_time()
-    pv_max = subcube.max(axis=1, save_to_tmp_dir=True)
+    pv_max = subcube.max(axis=1)
     print(f'Time to calculate max: {time.process_time() - t}')
 
     t = time.process_time()
