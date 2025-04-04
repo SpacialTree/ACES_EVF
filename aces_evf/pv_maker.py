@@ -16,9 +16,6 @@ import regions
 from regions import Regions
 import time
 
-# Path to where to save the PV diagrams
-save_path = '/orange/adamginsburg/ACES/broadline_sources/EVFs/images/HNCO/'
-
 # Latitude extrema
 B_MIN = -0.27 * u.deg
 B_MAX = 0.22 * u.deg
@@ -48,7 +45,7 @@ def make_position_list(amin, amax, step=0.5 * u.arcmin, unit=u.arcmin):
     return (np.arange(amin.to(unit).value, amax.to(unit).value + 1, step.value) * unit).to(u.deg)
 
 
-def make_pv_b(cube, latitude, mol):
+def make_pv_b(cube, latitude, mol, save_to_file=False):
     """
     Make a PV diagram along a given latitude.
 
@@ -76,22 +73,24 @@ def make_pv_b(cube, latitude, mol):
         pv_mean = subcube.mean(axis=1)
         print(f'Time to calculate mean: {time.process_time() - t}')
 
-        t = time.process_time()
-        pv_mean.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_mean.fits', overwrite=True)
-        print(f'Time to write mean: {time.process_time() - t}')
+        if save_to_file:
+            t = time.process_time()
+            pv_mean.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_mean.fits', overwrite=True)
+            print(f'Time to write mean: {time.process_time() - t}')
 
         t = time.process_time()
         pv_max = subcube.max(axis=1)
         print(f'Time to calculate max: {time.process_time() - t}')
 
-        t = time.process_time()
-        pv_max.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_max.fits', overwrite=True)
-        print(f'Time to write max: {time.process_time() - t}')
+        if save_to_file:
+            t = time.process_time()
+            pv_max.write(f'{save_path}/{mol}_pv_b{round(latitude.value, 3)}_max.fits', overwrite=True)
+            print(f'Time to write max: {time.process_time() - t}')
 
     print('Done with b =', latitude)
 
 
-def make_pv_l(cube, longitude, mol):
+def make_pv_l(cube, longitude, mol, save_to_file=False):
     """
     Make a PV diagram along a given longitude.
 
@@ -119,21 +118,23 @@ def make_pv_l(cube, longitude, mol):
         pv_mean = subcube.mean(axis=2)
         print(f'Time to calculate mean: {time.process_time() - t}')
 
-        t = time.process_time()
-        pv_mean.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_mean.fits', overwrite=True)
-        print(f'Time to write mean: {time.process_time() - t}')
+        if save_to_file:
+            t = time.process_time()
+            pv_mean.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_mean.fits', overwrite=True)
+            print(f'Time to write mean: {time.process_time() - t}')
 
         t = time.process_time()
         pv_max = subcube.max(axis=2)
         print(f'Time to calculate max: {time.process_time() - t}')
 
-        t = time.process_time()
-        pv_max.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_max.fits', overwrite=True)
-        print(f'Time to write max: {time.process_time() - t}')
+        if save_to_file:
+            t = time.process_time()
+            pv_max.write(f'{save_path}/{mol}_pv_l{round(longitude.value, 3)}_max.fits', overwrite=True)
+            print(f'Time to write max: {time.process_time() - t}')
 
     print('Done with l =', longitude)
 
-def make_pv(cube, position, mol, axis):
+def make_pv(cube, position, mol, axis, save_to_file=False, plot=True):
     """ 
     Make a PV diagram along a given axis.
 
@@ -173,21 +174,75 @@ def make_pv(cube, position, mol, axis):
         pv_mean = subcube.mean(axis=axis)
         print(f'Time to calculate mean: {time.process_time() - t}')
 
-        t = time.process_time()
-        pv_mean.write(f'{save_path}/{mol}_pv_{pv_axis}{round(position.value, 3)}_mean.fits', overwrite=True)
-        print(f'Time to write mean: {time.process_time() - t}')
+        if save_to_file:
+            t = time.process_time()
+            pv_mean.write(f'{save_path}/{mol}_pv_{pv_axis}{round(position.value, 3)}_mean.fits', overwrite=True)
+            print(f'Time to write mean: {time.process_time() - t}')
+
+        if plot:
+            plot_pv(pv_mean, mol, position, pv_axis, 'mean')
 
         t = time.process_time()
         pv_max = subcube.max(axis=axis)
         print(f'Time to calculate max: {time.process_time() - t}')
 
-        t = time.process_time()
-        pv_max.write(f'{save_path}/{mol}_pv_{pv_axis}{round(position.value, 3)}_max.fits', overwrite=True)
-        print(f'Time to write max: {time.process_time() - t}')
+        if save_to_file:
+            t = time.process_time()
+            pv_max.write(f'{save_path}/{mol}_pv_{pv_axis}{round(position.value, 3)}_max.fits', overwrite=True)
+            print(f'Time to write max: {time.process_time() - t}')
+
+        if plot:
+            plot_pv(pv_max, mol, position, pv_axis, 'max')
 
     print(f'Done with {pv_axis} =', position)
 
-def make_pv_mol(cube_fn):
+def plot_pv(pv, mol, pos, pv_axis, method, close=True):
+    """
+    Plot the PV diagram.
+
+    Parameters
+    ----------
+    pv : SpectralCube
+        SpectralCube object of the PV diagram.
+    mol : str
+        Molecule name.
+    pos : Quantity
+        Position of the PV diagram.
+    pv_axis : str
+        Axis along which the PV diagram was made.
+    method : str
+        Method used to make the PV diagram.
+    """
+
+    ww = WCS(pv.header)
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(111, projection=ww)
+    vmin = np.nanpercentile(pv.data, 1)
+    vmax = np.nanpercentile(pv.data, 99)
+    ax.imshow(pv.data, aspect='auto', vmin=vmin, vmax=vmax, cmap='inferno')
+
+    ax11 = ax.coords[1]
+    ax11.set_format_unit(u.km / u.s)
+    ax.set_ylabel('Velocity (km/s)')
+
+    if pv_axis == 'b':
+        ax.set_xlabel('Longitude (deg)')
+        ax.set_title(f'{mol} {method} PV diagram at b={round(pos.value, 3)}')
+        plt.tight_layout()
+        plt.savefig(f'{save_path}/{mol}_{method}_pv_b{round(pos.value, 3)}.png')
+    elif pv_axis == 'l':
+        ax.set_xlabel('Latitude (deg)')
+        ax.set_title(f'{mol} {method} PV diagram at l={round(pos.value, 3)}')
+        plt.tight_layout()
+        plt.savefig(f'{save_path}/{mol}_{method}_pv_l{round(pos.value, 3)}.png')
+    else:
+        print('Invalid axis')
+        return
+
+    if close:
+        plt.close()
+
+def make_pv_mol(cube_fn, save_to_file=False):
     """
     Make PV diagrams for a given molecule.
 
@@ -200,30 +255,36 @@ def make_pv_mol(cube_fn):
     t = time.process_time()
     cube = SpectralCube.read(cube_fn, use_dask=True)
     print(f'Time to read cube: {time.process_time() - t}')
-    #cube.use_dask_scheduler('threads', num_workers=4)
+    #t = time.process_time()
+    #cube.rechunk(chunks=(-1, 'auto', 'auto'), save_to_tmp_dir=True)
+    #print(f'Time to rechunk: {time.process_time() - t}')
     mol = cube_fn.split('/')[-1].split('_')[0]
 
-    list_b = make_position_list(B_MIN, B_MAX)
-    list_l = make_position_list(L_MIN, L_MAX)
+    list_b = make_position_list(B_MIN, B_MAX)[-10:]
+    list_l = make_position_list(L_MIN, L_MAX)[-10:] # temp: only take last 10 latitudes
 
     print('Starting PV diagrams for', mol)
     for latitude in list_b:
         print('Making PV diagram at b =', latitude)
-        make_pv(cube, latitude, mol, 1)
+        make_pv(cube, latitude, mol, 1, save_to_file=save_to_file)
 
     for longitude in list_l:
         print('Making PV diagram at l =', longitude)
-        make_pv(cube, longitude, mol, 2)
+        make_pv(cube, longitude, mol, 2, save_to_file=save_to_file)
 
 
 def main():
+    # Path to where to save the PV diagrams
+    save_path = '/orange/adamginsburg/ACES/broadline_sources/EVFs/images/CS21/'
+    # Path to where cubes are stored
     basepath = '/orange/adamginsburg/ACES/mosaics/cubes/'
-    #cube_fn_CS = f'{basepath}/CS21_CubeMosaic.fits'
-    #make_pv_mol(cube_fn_CS)
+    print('Starting CS 2-1')
+    cube_fn_CS = f'{basepath}/CS21_CubeMosaic.fits'
+    make_pv_mol(cube_fn_CS, save_to_file=True)
 
-    print('Starting HNCO')
-    cube_fn_HNCO = f'{basepath}/HNCO_7m12mTP_CubeMosaic.fits'
-    make_pv_mol(cube_fn_HNCO)
+    #print('Starting HNCO')
+    #cube_fn_HNCO = f'{basepath}/HNCO_7m12mTP_CubeMosaic.fits'
+    #make_pv_mol(cube_fn_HNCO)
 
 
 if __name__ == "__main__":
