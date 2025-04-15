@@ -45,7 +45,7 @@ def make_position_list(amin, amax, step=0.5 * u.arcmin, unit=u.arcmin):
     return (np.arange(amin.to(unit).value, amax.to(unit).value + 1, step.value) * unit).to(u.deg)
 
 
-def make_pv_b(cube, latitude, mol, save_to_file=False):
+def make_pv_b(cube, latitude, mol, save_path, save_to_file=False):
     """
     Make a PV diagram along a given latitude.
 
@@ -90,7 +90,7 @@ def make_pv_b(cube, latitude, mol, save_to_file=False):
     print('Done with b =', latitude)
 
 
-def make_pv_l(cube, longitude, mol, save_to_file=False):
+def make_pv_l(cube, longitude, mol, save_path, save_to_file=False):
     """
     Make a PV diagram along a given longitude.
 
@@ -134,7 +134,7 @@ def make_pv_l(cube, longitude, mol, save_to_file=False):
 
     print('Done with l =', longitude)
 
-def make_pv(cube, position, mol, axis, save_to_file=False, plot=True):
+def make_pv(cube, position, mol, axis, save_path, save_to_file=False, plot=True):
     """ 
     Make a PV diagram along a given axis.
 
@@ -180,7 +180,7 @@ def make_pv(cube, position, mol, axis, save_to_file=False, plot=True):
             print(f'Time to write mean: {time.process_time() - t}')
 
         if plot:
-            plot_pv(pv_mean, mol, position, pv_axis, 'mean')
+            plot_pv(pv_mean, mol, position, pv_axis, 'mean', save_path)
 
         t = time.process_time()
         pv_max = subcube.max(axis=axis)
@@ -192,11 +192,11 @@ def make_pv(cube, position, mol, axis, save_to_file=False, plot=True):
             print(f'Time to write max: {time.process_time() - t}')
 
         if plot:
-            plot_pv(pv_max, mol, position, pv_axis, 'max')
+            plot_pv(pv_max, mol, position, pv_axis, 'max', save_path)
 
     print(f'Done with {pv_axis} =', position)
 
-def plot_pv(pv, mol, pos, pv_axis, method, close=True):
+def plot_pv(pv, mol, pos, pv_axis, method, save_path, close=True):
     """
     Plot the PV diagram.
 
@@ -242,7 +242,7 @@ def plot_pv(pv, mol, pos, pv_axis, method, close=True):
     if close:
         plt.close()
 
-def make_pv_mol(cube_fn, save_to_file=False):
+def make_pv_mol(cube_fn, save_path, save_to_file=False):
     """
     Make PV diagrams for a given molecule.
 
@@ -266,11 +266,11 @@ def make_pv_mol(cube_fn, save_to_file=False):
     print('Starting PV diagrams for', mol)
     for latitude in list_b:
         print('Making PV diagram at b =', latitude)
-        make_pv(cube, latitude, mol, 1, save_to_file=save_to_file)
+        make_pv(cube, latitude, mol, 1, save_path, save_to_file=save_to_file)
 
     for longitude in list_l:
         print('Making PV diagram at l =', longitude)
-        make_pv(cube, longitude, mol, 2, save_to_file=save_to_file)
+        make_pv(cube, longitude, mol, 2, save_path, save_to_file=save_to_file)
 
 
 def main():
@@ -280,7 +280,7 @@ def main():
     basepath = '/orange/adamginsburg/ACES/mosaics/cubes/'
     print('Starting CS 2-1')
     cube_fn_CS = f'{basepath}/CS21_CubeMosaic.fits'
-    make_pv_mol(cube_fn_CS, save_to_file=True)
+    make_pv_mol(cube_fn_CS, save_path, save_to_file=True)
 
     #print('Starting HNCO')
     #cube_fn_HNCO = f'{basepath}/HNCO_7m12mTP_CubeMosaic.fits'
