@@ -31,30 +31,58 @@ def main(line_list=['CS21'], mode=False):
     regs = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
     if not mode: 
         print('Processing all regions individually', flush=True)
-        for reg in regs: 
-            l = reg.center.galactic.l.value
-            b = reg.center.galactic.b.value
-            l = round(l, 3)
-            b = round(b, 3)
+        if len(line_list) > 1:
+            for reg in regs: 
+                l = reg.center.galactic.l.value
+                b = reg.center.galactic.b.value
+                l = round(l, 3)
+                b = round(b, 3)
 
+                for line in line_list:
+                    line_dir = os.path.join(save_dir, line)
+                    fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
+                    cube = SpectralCube.read(fn, use_dask=True)
+                    
+
+                    # Create a subcube from the region
+                    start = timeit.default_timer()
+                    subcube = cube.subcube_from_regions([reg])
+                    subcube = subcube.with_spectral_unit(u.km/u.s, velocity_convention='radio')
+                    end = timeit.default_timer()
+                    print(f'Subcube creation took {end - start} seconds', flush=True)
+                    
+                    print(f'Writing {line} l{l} b{b} to {os.path.join(line_dir, f"{line}_l{l}_b{b}.fits")}', flush=True)
+                    start = timeit.default_timer()
+                    subcube.write(os.path.join(line_dir, f'{line}_l{l}_b{b}.fits'), overwrite=True)
+                    end = timeit.default_timer()
+                    print(f'Writing took {end - start} seconds', flush=True)
+        elif len(line_list) == 1:
             for line in line_list:
                 line_dir = os.path.join(save_dir, line)
                 fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
                 cube = SpectralCube.read(fn, use_dask=True)
-                end = timeit.default_timer()
 
-                # Create a subcube from the region
-                start = timeit.default_timer()
-                subcube = cube.subcube_from_regions([reg])
-                subcube = subcube.with_spectral_unit(u.km/u.s, velocity_convention='radio')
-                end = timeit.default_timer()
-                print(f'Subcube creation took {end - start} seconds', flush=True)
-                
-                print(f'Writing {line} l{l} b{b} to {os.path.join(line_dir, f"{line}_l{l}_b{b}.fits")}', flush=True)
-                start = timeit.default_timer()
-                subcube.write(os.path.join(line_dir, f'{line}_l{l}_b{b}.fits'), overwrite=True)
-                end = timeit.default_timer()
-                print(f'Writing took {end - start} seconds', flush=True)
+                for reg in regs: 
+                    l = reg.center.galactic.l.value
+                    b = reg.center.galactic.b.value
+                    l = round(l, 3)
+                    b = round(b, 3)
+
+                    # Create a subcube from the region
+                    start = timeit.default_timer()
+                    subcube = cube.subcube_from_regions([reg])
+                    subcube = subcube.with_spectral_unit(u.km/u.s, velocity_convention='radio')
+                    end = timeit.default_timer()
+                    print(f'Subcube creation took {end - start} seconds', flush=True)
+                    
+                    print(f'Writing {line} l{l} b{b} to {os.path.join(line_dir, f"{line}_l{l}_b{b}.fits")}', flush=True)
+                    start = timeit.default_timer()
+                    subcube.write(os.path.join(line_dir, f'{line}_l{l}_b{b}.fits'), overwrite=True)
+                    end = timeit.default_timer()
+                    print(f'Writing took {end - start} seconds', flush=True)
+        else:
+            print('No lines to process', flush=True)
+            exit(1)
     else: 
         print('Processing all regions together', flush=True)
         for line in line_list:
