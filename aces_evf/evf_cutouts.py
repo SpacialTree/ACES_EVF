@@ -107,14 +107,13 @@ def main(line_list=['CS21'], mode=False):
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser()
-    parser.add_option("-l", "--lines", dest="lines",
-                      default='CS21',
+    parser.add_option("-l", "--lines", dest="lines", default='CS21',
                       help="comma-separated list of lines to process", metavar="lines")
-    parser.add_option('-m', '--mode', dest='mode', default=False,
-                      help='True=all regions together, False=separate regions')
+    parser.add_option('-m', '--big', dest='big', action='store_true',# default=True,
+                      help='On=all regions together, Off=separate regions')
     (options, args) = parser.parse_args()
     lines = options.lines.split(',')
-    mode = bool(options.mode)
+    mode = bool(options.big)
     print(f'Processing lines: {lines} with mode: {mode}', flush=True)
 
     cube_mosaic_dir = '/orange/adamginsburg/ACES/mosaics/cubes/'
