@@ -53,7 +53,6 @@ from spectral_cube import Projection
 from reproject import reproject_interp
 
 
-# In[27]:
 
 
 #Paths and definitions
@@ -61,13 +60,11 @@ drivepath = '/orange/adamginsburg/ACES/mosaics/cubes/' #Data directory containin
 mom0dir = '/orange/adamginsburg/ACES/broadline_sources/EVFs/moments/'#Directory where mom0 maps are stored. Please don't put other things in this directory.
 savedir_figure = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/' #Directory where ratio map figures will be saved (with folders in this dir made for each EVF)
 
-# In[28]:
 
 EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 EVF_reg = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
 
 
-# In[47]:
 
 
 vel_range_list = []
@@ -83,9 +80,6 @@ for evf in EVF_tab:
     lb_list.append(lb)
 
 linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP', 'HCOP_noTP']
-
-
-# In[48]:
 
 
 #Make and save moment 0 maps for all line tracers
@@ -105,9 +99,6 @@ for line in linetracers:
 
 
             mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
-
-
-# In[49]:
 
 
 #Gets an array of all the EVF sources to make ratio maps for
@@ -137,8 +128,6 @@ while i<len(file_names):
 sources_listed_once = [i for n, i in enumerate(source_names) if i not in source_names[:n]] #removes any duplicates from list (& keeps order)
 print("The number of EVFs to do ratio maps for: ", len(sources_listed_once))
 
-
-# In[ ]:
 
 
 #This will make and save line tracer ratio maps for all EVF sources
