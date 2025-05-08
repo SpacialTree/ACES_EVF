@@ -236,6 +236,6 @@ while s<len(sources_listed_once): #Iterates through each source
         del lines_avoidredundant[0] #remove 1st element each line iteration to redundant runs (if CS-HC3N done, don't do HC3N-CS)
         del mom0_avoidredundant[0]
         i+=1
-    print("**************************************")
+    #print("**************************************")
 
     s+=1
