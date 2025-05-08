@@ -1,16 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[3]:
-
-
-#from IPython.display import display, HTML
-#display(HTML("<style>.container { width:96% !important; }</style>"))
-
-
-# In[2]:
-
-
 import os, glob
 from pathlib import Path
 
