@@ -79,7 +79,7 @@ for evf in EVF_tab:
     lb=(evf['l'], evf['b'])
     lb_list.append(lb)
 
-linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP', 'HCOP_noTP']
+linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP']#, 'HCOP_noTP']
 
 
 #Make and save moment 0 maps for all line tracers
