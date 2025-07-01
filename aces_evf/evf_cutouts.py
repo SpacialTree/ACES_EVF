@@ -20,6 +20,7 @@ print('Running EVF Cutouts', flush=True)
 #regs = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
 #line_list = ['CS21']#['H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'CS21']
 #H13CN, H13CO+, SiO, HCO+, HNCO, SO(3-2), SO(2-1), HN13C, HC3N, CS(2-1)
+# test
 
 def main(line_list=['CS21'], mode=False): 
     save_dir = '/orange/adamginsburg/ACES/broadline_sources/EVFs/cubes/'
