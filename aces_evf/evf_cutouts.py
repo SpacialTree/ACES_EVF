@@ -11,6 +11,7 @@ import astropy.units as u
 from astropy import log
 import os
 import timeit
+from astropy.table import Table
 print('Running EVF Cutouts', flush=True)
 
 #cube_mosaic_dir = '/orange/adamginsburg/ACES/mosaics/cubes/'
@@ -28,13 +29,15 @@ def main(line_list=['CS21'], mode=False):
             print(f'Creating directory {line_dir}', flush=True)
             os.makedirs(line_dir)
 
-    regs = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
+    #regs = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
+    tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
     if not mode: 
         print('Processing all regions individually', flush=True)
         if len(line_list) > 1:
-            for reg in regs: 
-                l = reg.center.galactic.l.value
-                b = reg.center.galactic.b.value
+            for row in tbl: 
+                l = row['l']
+                b = row['b']
+                reg = regions.RectangleSkyRegion(SkyCoord(l, b, unit='deg', frame='galactic'), width=row['deltal']*u.deg, height=row['deltab']*u.deg)
                 l = round(l, 3)
                 b = round(b, 3)
 
@@ -51,9 +54,10 @@ def main(line_list=['CS21'], mode=False):
                     end = timeit.default_timer()
                     print(f'Subcube creation took {end - start} seconds', flush=True)
                     
-                    print(f'Writing {line} l{l} b{b} to {os.path.join(line_dir, f"{line}_l{l}_b{b}.fits")}', flush=True)
+                    write_fn = os.path.join(line_dir, f'EVF_#{row["ID Number"]}_{line}_l{l}_b{b}.fits')
+                    print(f'Writing {line} l{l} b{b} to {write_fn}', flush=True)
                     start = timeit.default_timer()
-                    subcube.write(os.path.join(line_dir, f'{line}_l{l}_b{b}.fits'), overwrite=True)
+                    subcube.write(write_fn, overwrite=True)
                     end = timeit.default_timer()
                     print(f'Writing took {end - start} seconds', flush=True)
         elif len(line_list) == 1:
@@ -61,10 +65,12 @@ def main(line_list=['CS21'], mode=False):
                 line_dir = os.path.join(save_dir, line)
                 fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
                 cube = SpectralCube.read(fn, use_dask=True)
+                tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 
-                for reg in regs: 
+                for row in tbl: 
                     l = reg.center.galactic.l.value
                     b = reg.center.galactic.b.value
+                    reg = regions.RectangleSkyRegion(SkyCoord(l, b, unit='deg', frame='galactic'), width=row['deltal']*u.deg, height=row['deltab']*u.deg)
                     l = round(l, 3)
                     b = round(b, 3)
 
@@ -74,10 +80,11 @@ def main(line_list=['CS21'], mode=False):
                     subcube = subcube.with_spectral_unit(u.km/u.s, velocity_convention='radio')
                     end = timeit.default_timer()
                     print(f'Subcube creation took {end - start} seconds', flush=True)
-                    
-                    print(f'Writing {line} l{l} b{b} to {os.path.join(line_dir, f"{line}_l{l}_b{b}.fits")}', flush=True)
+
+                    write_fn = os.path.join(line_dir, f'EVF_#{row["ID Number"]}_{line}_l{l}_b{b}.fits')
+                    print(f'Writing {line} l{l} b{b} to {write_fn}', flush=True)
                     start = timeit.default_timer()
-                    subcube.write(os.path.join(line_dir, f'{line}_l{l}_b{b}.fits'), overwrite=True)
+                    subcube.write(write_fn, overwrite=True)
                     end = timeit.default_timer()
                     print(f'Writing took {end - start} seconds', flush=True)
         else:
