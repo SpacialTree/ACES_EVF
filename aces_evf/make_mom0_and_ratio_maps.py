@@ -99,7 +99,7 @@ for line in linetracers:
             mom0 = subcube.moment(order=0)
 
 
-            mom0.write(mom0folder +f'/evf{evf_num[i]}_l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
+            mom0.write(mom0folder +f'/EVF_{evf_num[i]}_l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
             #mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
 
 
