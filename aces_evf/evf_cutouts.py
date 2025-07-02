@@ -45,7 +45,7 @@ def main(line_list=['CS21'], mode=False):
                 for line in line_list:
                     line_dir = os.path.join(save_dir, line)
                     fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
-                    cube = SpectralCube.read(fn, use_dask=True)
+                    cube = SpectralCube.read(fn, use_dask=False)
                     
 
                     # Create a subcube from the region
@@ -55,7 +55,7 @@ def main(line_list=['CS21'], mode=False):
                     end = timeit.default_timer()
                     print(f'Subcube creation took {end - start} seconds', flush=True)
                     
-                    write_fn = os.path.join(line_dir, f'EVF_#{row["ID Number"]}_{line}_l{l}_b{b}.fits')
+                    write_fn = os.path.join(line_dir, f'EVF_{row["ID Number"]}_{line}_l{l}_b{b}.fits')
                     print(f'Writing {line} l{l} b{b} to {write_fn}', flush=True)
                     start = timeit.default_timer()
                     subcube.write(write_fn, overwrite=True)
@@ -65,9 +65,11 @@ def main(line_list=['CS21'], mode=False):
             for line in line_list:
                 line_dir = os.path.join(save_dir, line)
                 fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
-                cube = SpectralCube.read(fn, use_dask=True)
+                print(f"Reading cube: {fn}", flush=True)
+                cube = SpectralCube.read(fn, use_dask=False)
                 #tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 
+                print('Beginning to loop through individual fields to make and write subcubes.', flush=True)
                 for row in tbl: 
                     l = row['l']#reg.center.galactic.l.value
                     b = row['b']#reg.center.galactic.b.value
@@ -82,7 +84,7 @@ def main(line_list=['CS21'], mode=False):
                     end = timeit.default_timer()
                     print(f'Subcube creation took {end - start} seconds', flush=True)
 
-                    write_fn = os.path.join(line_dir, f'EVF_#{row["ID Number"]}_{line}_l{l}_b{b}.fits')
+                    write_fn = os.path.join(line_dir, f'EVF_{row["ID Number"]}_{line}_l{l}_b{b}.fits')
                     print(f'Writing {line} l{l} b{b} to {write_fn}', flush=True)
                     start = timeit.default_timer()
                     subcube.write(write_fn, overwrite=True)
@@ -96,7 +98,7 @@ def main(line_list=['CS21'], mode=False):
         for line in line_list:
             line_dir = os.path.join(save_dir, line)
             fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
-            cube = SpectralCube.read(fn, use_dask=True)
+            cube = SpectralCube.read(fn, use_dask=False)
 
             # Create a subcube from the region list
             print(f'Creating subcube for {line} from all regions', flush=True)
