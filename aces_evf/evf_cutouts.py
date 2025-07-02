@@ -66,11 +66,11 @@ def main(line_list=['CS21'], mode=False):
                 line_dir = os.path.join(save_dir, line)
                 fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
                 cube = SpectralCube.read(fn, use_dask=True)
-                tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
+                #tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 
                 for row in tbl: 
-                    l = reg.center.galactic.l.value
-                    b = reg.center.galactic.b.value
+                    l = row['l']#reg.center.galactic.l.value
+                    b = row['b']#reg.center.galactic.b.value
                     reg = regions.RectangleSkyRegion(SkyCoord(l, b, unit='deg', frame='galactic'), width=row['deltal']*u.deg, height=row['deltab']*u.deg)
                     l = round(l, 3)
                     b = round(b, 3)
