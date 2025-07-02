@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 import os, glob
 from pathlib import Path
 
@@ -40,33 +46,41 @@ from spectral_cube import Projection
 from reproject import reproject_interp
 
 
+# In[6]:
 
 
 #Paths and definitions
 drivepath = '/orange/adamginsburg/ACES/mosaics/cubes/' #Data directory containing cubes
 mom0dir = '/orange/adamginsburg/ACES/broadline_sources/EVFs/moments/'#Directory where mom0 maps are stored. Please don't put other things in this directory.
-savedir_figure = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/' #Directory where ratio map figures will be saved (with folders in this dir made for each EVF)
+savedir_fits = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/fits/' #Directory where ratio map figures will be saved (with folders in this dir made for each EVF)
 
 
 EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 EVF_reg = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
 
 
+# In[32]:
 
 
 vel_range_list = []
 delta_l_list  = []
 delta_b_list = []
 lb_list = []
+evf_num = []
 for evf in EVF_tab:
     vel_range = (evf['min_v'], evf['max_v'])
     vel_range_list.append(vel_range)
     delta_l_list.append(evf['deltal'])
     delta_b_list.append(evf['deltab'])
+    evf_num.append(evf['ID Number'])
     lb=(evf['l'], evf['b'])
     lb_list.append(lb)
 
-linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP']#, 'HCOP_noTP']
+#linetracers = ['SiOFAKE', 'CS21FAKE', 'HNCOFAKE']
+linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP']
+
+
+# In[24]:
 
 
 #Make and save moment 0 maps for all line tracers
@@ -85,62 +99,53 @@ for line in linetracers:
             mom0 = subcube.moment(order=0)
 
 
-            mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
+            mom0.write(mom0folder +f'/evf{evf_num[i]}_l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
+            #mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
 
 
-#Gets an array of all the EVF sources to make ratio maps for
-file_names = []
+# In[33]:
 
-for line in linetracers:
-    mom0folder = mom0dir + '{}'.format(line)
-    for file in os.listdir(mom0folder):
-        filename = os.fsdecode(file)
-        if filename.endswith('.fits'):
-            file_names.append(filename)
-            
-#Gets an array of just the EVF name strings (for labels/file naming/matching)
-source_names=[]
+
+#Gets array of all the EVFs to make line ratios for
+evf_source_names=[]
+lb_name_list=[]
 i=0
-while i<len(file_names):
-    array = file_names[i].split('_')
-    if len(array)==3:
-        l = array[0] #This is how I piece together the EVF source name from file name
-        b = array[1]
-        source = l + '_' + b
-        source_names.append(source)
-    else: 
-        print("There's a file name that's structured differently than others in this directory!")
-    i+=1
+s=0
 
-sources_listed_once = [i for n, i in enumerate(source_names) if i not in source_names[:n]] #removes any duplicates from list (& keeps order)
-print("The number of EVFs to do ratio maps for: ", len(sources_listed_once))
+for idx,lb in enumerate(lb_list):
+    lb_name='l' + str(lb[0])+'_b'+str(lb[1])
+    evf_source_names.append('evf'+str(evf_num[idx])+'_'+lb_name)
+    lb_name_list.append(lb_name)
 
 
+# In[23]:
 
-#This will make and save line tracer ratio maps for all EVF sources
+
+#This will make and save line tracer ratio maps AS FITS FILES for all EVF sources
 noise_threshold = 9*10**(-3) #Jy/beam noise threshold below which we mask in our ratio maps (including any absorption)
 s=0
 i=0
-while s<len(sources_listed_once): #Iterates through each source
+while s<len(evf_source_names): #Iterates through each source
     #Figure out which lines are available for each EVF source
-    source=sources_listed_once[s]
+    source=evf_source_names[s]
+    lb_name=lb_name_list[s]
+    
     lines = linetracers.copy() #array for line names
     mom0paths = [] #array for the source's mom0 maps
     for line in lines: 
         for folder in os.listdir(mom0dir): #goes through line folders (and any other files/folders) in mom0dir
             foldername = os.fsdecode(folder)
             if line in foldername:
-                print(line)
                 for file in os.listdir(mom0dir+foldername):
                     filename = os.fsdecode(file)
-                    if source in filename: 
-                        print(filename)
+                    if source + '_' in filename: 
                         mom0paths.append(filename)
     
+    print(mom0paths)
     lines_avoidredundant = lines.copy() #arrays I'll remove elements from to avoid redundant pairs
     mom0_avoidredundant = mom0paths.copy()
-    #print("Source: ")
-    #print(sources_listed_once[s])
+    print("Source: ")
+    print(evf_source_names[s])
     
     i=0
     while i<len(lines):
@@ -152,13 +157,13 @@ while s<len(sources_listed_once): #Iterates through each source
                 print(lines[i], "-->", lines_avoidredundant[r])
                 #Open mom0 map of line 1:
                 mom0path1 = mom0dir + lines[i] + '/' + mom0paths[i]
-                #print(mom0path1)
+                print(mom0path1)
                 hdul = fits.open(mom0path1)
                 sc_line1_moment0 = Projection.from_hdu(hdul) #makes 2D spectral cube object called a "Projection"
                 
                 #Open mom0 map of line2:
                 mom0path2 = mom0dir + lines_avoidredundant[r] + '/' + mom0_avoidredundant[r]
-                #print(mom0path2)
+                print(mom0path2)
                 hdul = fits.open(mom0path2)
                 sc_line2_moment0 = Projection.from_hdu(hdul) #makes 2D spectral cube object called a "Projection"
                 
@@ -174,44 +179,41 @@ while s<len(sources_listed_once): #Iterates through each source
                 ratio[badpix] = np.nan # Mask the ratio map
                 ratio[badpix2] = np.nan
 
-                
-                #Plot (with a color bar)
+                #Check for all-NaN ratio maps
                 if np.isnan(np.nanmin(ratio))==True or np.isnan(np.nanmax(ratio))==True:
                     print("!!!!! ALL-NAN RATIO MAP !!!!!!!!!!!!")
                     print("Check mom0 maps for: ", source)
                     print("Potentially problematic maps: ", mom0path1, mom0path2)
-                    
+                
+                #Make and save ratio map .fits file   
                 else: 
-                    normalizer=colors.LogNorm(vmin=np.nanmin(ratio),vmax=np.nanmax(ratio)) #log scaling on ratio map and color bar
-                    imnorm=cm.ScalarMappable(norm=normalizer, cmap='rainbow')
+                    #Make a new .fits file to save ratio maps
+                    hdu_ratio = pyfits.PrimaryHDU(data=ratio)
+                    ratio_header = hdu_ratio.header
+                    mom02header = fits.getheader(mom0path2) #gets the header of the mom0 map we reproject to
 
-                    fig1 = pylab.figure(1,figsize=(15,15)) #Figure size
+                    ratio_header.set('ctype1',"GLON-TAN")
+                    ratio_header.set('crval1', mom02header['CRVAL1'])
+                    ratio_header.set('cdelt1', mom02header['CDELT1'])
+                    ratio_header.set('crpix1', mom02header['CRPIX1'])
+                    ratio_header.set('cunit1',"deg" )
 
-                    ax1 = pylab.subplot(1,1,1,projection=sc_line2_moment0.wcs) 
-                    im1 = pylab.imshow(ratio,cmap='rainbow', norm=normalizer)
+                    ratio_header.set('ctype2',"GLAT-TAN")
+                    ratio_header.set('crval2', mom02header['CRVAL2'])
+                    ratio_header.set('cdelt2', mom02header['CDELT2'])
+                    ratio_header.set('crpix2', mom02header['CRPIX2'])
+                    ratio_header.set('cunit2', "deg")
 
+                    #Save each ratio map as .fits files
+                    Path(savedir_fits+source).mkdir(parents=True, exist_ok=True) #look for folder individual EVF, if it doesn't exit, make it
+                    savepath_fits = savedir_fits + source + '/RatioMap_' + lines_avoidredundant[r] + '_' + lines[i] + '_' + source + '.fits'
+                    pyfits.writeto(savepath_fits, ratio, ratio_header, overwrite=True)   
 
-                    gallong = ax1.coords[0]                                                                
-                    gallat = ax1.coords[1]
-                    gallong.set_ticks(size=-3) #Axis ticks                                                                                      
-                    gallat.set_ticks(size=-3)  
-
-                    pylab.title('ACES %s' %source + ' Line Ratio Map', fontsize=20) 
-                    pylab.xlabel('Galactic Longitide',fontsize=15,labelpad=1)                               
-                    pylab.ylabel('Galactic Latitude',fontsize=15,labelpad=0)
-                    ax1.tick_params(axis = 'both', which = 'major', labelsize = 15)
-                    #Colorbar
-                    cb=pylab.colorbar(imnorm,fraction=0.046,pad=0.04)                                      
-                    cb.set_label(label='%s' %lines_avoidredundant[r] + ' /%s Ratio' %lines[i], fontsize=15,rotation=270,labelpad=20)
-                    cb.ax.tick_params(which = 'major', labelsize = 10)   
-                    #Save each figure
-                    Path(savedir_figure+source).mkdir(parents=True, exist_ok=True) ##look for folder individual EVF, if it doesn't exit, make it
-                    savepath_figure = savedir_figure + source + '/RatioMap_' + lines_avoidredundant[r] + '_' + lines[i] + '_' + source + '.png'
-                    pylab.savefig(savepath_figure)
                 r+=1
-        del lines_avoidredundant[0] #remove 1st element each line iteration to redundant runs (if CS-HC3N done, don't do HC3N-CS)
+        del lines_avoidredundant[0] #remove 1st element each line iteration to avoid redundant runs (if CS-HC3N done, don't do HC3N-CS)
         del mom0_avoidredundant[0]
         i+=1
-    #print("**************************************")
+    print("**************************************")
 
     s+=1
+
