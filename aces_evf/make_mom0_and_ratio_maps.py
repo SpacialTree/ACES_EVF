@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
 
 import os, glob
 from pathlib import Path
@@ -45,10 +40,6 @@ from spectral_cube import Projection
 
 from reproject import reproject_interp
 
-
-# In[6]:
-
-
 #Paths and definitions
 drivepath = '/orange/adamginsburg/ACES/mosaics/cubes/' #Data directory containing cubes
 mom0dir = '/orange/adamginsburg/ACES/broadline_sources/EVFs/moments/'#Directory where mom0 maps are stored. Please don't put other things in this directory.
@@ -57,10 +48,6 @@ savedir_fits = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/fits/' #
 
 EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 EVF_reg = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
-
-
-# In[32]:
-
 
 vel_range_list = []
 delta_l_list  = []
@@ -78,10 +65,6 @@ for evf in EVF_tab:
 
 #linetracers = ['SiOFAKE', 'CS21FAKE', 'HNCOFAKE']
 linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP']
-
-
-# In[24]:
-
 
 #Make and save moment 0 maps for all line tracers
 for line in linetracers:
@@ -103,9 +86,6 @@ for line in linetracers:
             #mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
 
 
-# In[33]:
-
-
 #Gets array of all the EVFs to make line ratios for
 evf_source_names=[]
 lb_name_list=[]
@@ -116,10 +96,6 @@ for idx,lb in enumerate(lb_list):
     lb_name='l' + str(lb[0])+'_b'+str(lb[1])
     evf_source_names.append('evf'+str(evf_num[idx])+'_'+lb_name)
     lb_name_list.append(lb_name)
-
-
-# In[23]:
-
 
 #This will make and save line tracer ratio maps AS FITS FILES for all EVF sources
 noise_threshold = 9*10**(-3) #Jy/beam noise threshold below which we mask in our ratio maps (including any absorption)
