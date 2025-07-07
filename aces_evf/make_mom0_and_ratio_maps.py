@@ -35,6 +35,7 @@ import astropy.io.fits as pyfits
 
 
 from regions import Regions
+import regions
 from spectral_cube import SpectralCube
 from spectral_cube import Projection
 
@@ -43,7 +44,7 @@ from reproject import reproject_interp
 #Paths and definitions
 drivepath = '/orange/adamginsburg/ACES/mosaics/cubes/' #Data directory containing cubes
 mom0dir = '/orange/adamginsburg/ACES/broadline_sources/EVFs/moments/'#Directory where mom0 maps are stored. Please don't put other things in this directory.
-savedir_fits = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/fits/' #Directory where ratio map figures will be saved (with folders in this dir made for each EVF)
+savedir_fits = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratio_maps/' #Directory where ratio map figures will be saved (with folders in this dir made for each EVF)
 
 
 EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
@@ -68,6 +69,7 @@ linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3
 
 #Make and save moment 0 maps for all line tracers
 for line in linetracers:
+    print("Making moment 0 maps for: ", line, flush=True)
     mom0folder = mom0dir + '{}'.format(line)
     Path(mom0folder).mkdir(parents=True, exist_ok=True) #look for folder for the linetracer mom0 maps, if it doesn't exit, make it
     for file in glob.glob(drivepath + line + '_CubeMosaic.fits', recursive=True):
@@ -76,12 +78,15 @@ for line in linetracers:
         data.close()
         cube.allow_huge_operations=True
 
-        for i in range(len(EVF_reg)):
-            subcube = cube.subcube_from_regions([EVF_reg[i]])
+        for i in range(len(EVF_tab)):
+            print("Making moment 0 map for EVF: ", evf_num[i], " at l,b: ", lb_list[i][0], lb_list[i][1], flush=True)
+            row = EVF_tab[i]
+            EVF_reg = regions.RectangleSkyRegion(SkyCoord(row['l'], row['b'], unit='deg', frame='galactic'), width=row['deltal']*u.deg, height=row['deltab']*u.deg)
+            subcube = cube.subcube_from_regions([EVF_reg])
             subcube = subcube.spectral_slab(vel_range_list[i][0]* u.km / u.s, vel_range_list[i][1]* u.km / u.s)
             mom0 = subcube.moment(order=0)
 
-
+            print("Saving moment 0 map for EVF: ", evf_num[i], " at l,b: ", lb_list[i][0], lb_list[i][1], flush=True)
             mom0.write(mom0folder +f'/EVF_{evf_num[i]}_l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
             #mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
 
@@ -101,6 +106,7 @@ for idx,lb in enumerate(lb_list):
 noise_threshold = 9*10**(-3) #Jy/beam noise threshold below which we mask in our ratio maps (including any absorption)
 s=0
 i=0
+print("Making ratio maps for all EVF sources", flush=True)
 while s<len(evf_source_names): #Iterates through each source
     #Figure out which lines are available for each EVF source
     source=evf_source_names[s]
@@ -189,7 +195,7 @@ while s<len(evf_source_names): #Iterates through each source
         del lines_avoidredundant[0] #remove 1st element each line iteration to avoid redundant runs (if CS-HC3N done, don't do HC3N-CS)
         del mom0_avoidredundant[0]
         i+=1
-    print("**************************************")
+    print("**************************************", flush=True)
 
     s+=1
 
