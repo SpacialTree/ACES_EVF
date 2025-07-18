@@ -27,7 +27,6 @@ from spectral_cube.utils import SpectralCubeWarning
 warnings.filterwarnings(action='ignore', category=SpectralCubeWarning,
                         append=True)
 
-
 #write paths
 basepath = '/orange/adamginsburg/ACES/broadline_sources/EVFs/'
 CS_cubes_path   = basepath + 'cubes/CS21/'
@@ -40,27 +39,12 @@ EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filter
 EVF_v_cent  = EVF_tab['V_LSR']
 EVF_v_width = EVF_tab['max_v'] - EVF_tab['min_v']
 
-
 def make_pv_plots(cube,ID_num,EVF_filename):
     LV = cube.mean(axis=1)
     BV = cube.mean(axis=2)
 
-    pyfits.writeto(basepath + 'pvdiagrams/EVF_{}_{}_LV.fits'.format(ID_num, EVF_filename), LV.value, LV.header, overwrite=True)
-    pyfits.writeto(basepath + 'pvdiagrams/EVF_{}_{}_BV.fits'.format(ID_num, EVF_filename), BV.value, BV.header, overwrite=True)
-
-
-def single_gauss(x,mu,sig, A):
-    return A*np.exp(-(x-mu)**2/2/sig**2)
-
-def double_gauss(x,mu1,mu2,A1,A2,sig1,sig2):
-    return single_gauss(x,mu1,sig1,A1)+single_gauss(x,mu2,sig2,A2)
-
-def make_pv_plots(cube,ID_num,EVF_filename):
-    LV = cube.mean(axis=1)
-    BV = cube.mean(axis=2)
-
-    pyfits.writeto('./pvdiagrams/EVF_{}_{}_LV.fits'.format(ID_num, EVF_filename), LV.value, LV.header, overwrite=True)
-    pyfits.writeto('./pvdiagrams/EVF_{}_{}_BV.fits'.format(ID_num, EVF_filename), BV.value, BV.header, overwrite=True)
+    pyfits.writeto(f'{basepath}/pvdiagrams/EVF_{ID_num}_{EVF_filename}_LV.fits', LV.value, LV.header, overwrite=True)
+    pyfits.writeto(f'{basepath}/pvdiagrams/EVF_{ID_num}_{EVF_filename}_BV.fits', BV.value, BV.header, overwrite=True)
 
 
 def single_gauss(x,mu,sig, A):
@@ -109,7 +93,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
             transform=ax.transAxes)
         ax.set_xlabel('km/s')
         ax.set_ylabel('Jy/beam')
-        plt.savefig('./spectra/EVF_{}_{}_1Dspectrum_linewidths.png'.format(ID_num, EVF_filename), bbox_inches='tight')
+        plt.savefig(f'{basepath}/spectra/EVF_{ID_num}_{EVF_filename}_1Dspectrum_linewidths.png', bbox_inches='tight')
         plt.show()
         return mu1,mu2,A1,A2,sig1,sig2
  
@@ -141,7 +125,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
             transform=ax.transAxes)
         ax.set_xlabel('km/s')
         ax.set_ylabel('Jy/beam')
-        plt.savefig(f'{basepath}/spectra/EVF_{}_{}_1Dspectrum_linewidths.png'.format(ID_num, EVF_filename), bbox_inches='tight')
+        plt.savefig(f'{basepath}/spectra/EVF_{ID_num}_{EVF_filename}_1Dspectrum_linewidths.png', bbox_inches='tight')
 
         plt.show()
         return mu1, np.nan, A1, np.nan, sig1, np.nan  
