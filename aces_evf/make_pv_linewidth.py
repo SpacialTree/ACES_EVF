@@ -36,7 +36,7 @@ HC3N_cubes_path = basepath + 'cubes/HC3N/'
 
 
 ##Open the filted EVF table 
-EVF_tab = Table.read('Filtered_EVFs_table.ecsv')
+EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 EVF_v_cent  = EVF_tab['V_LSR']
 EVF_v_width = EVF_tab['max_v'] - EVF_tab['min_v']
 
