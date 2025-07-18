@@ -161,7 +161,7 @@ for file in glob.glob(CS_cubes_path + '*.fits', recursive=True):
         FWHM2_list.append(str('-'))
         
     #Make the CS PV diagrams
-    make_pv_plots(CS_cube, ID_num,EVF_filename)
+    make_pv_plots(cube, ID_num,EVF_filename)
     
 
 #Write output to table
