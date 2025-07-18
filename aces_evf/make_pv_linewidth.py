@@ -141,7 +141,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
             transform=ax.transAxes)
         ax.set_xlabel('km/s')
         ax.set_ylabel('Jy/beam')
-        plt.savefig('./spectra/EVF_{}_{}_1Dspectrum_linewidths.png'.format(ID_num, EVF_filename), bbox_inches='tight')
+        plt.savefig(f'{basepath}/spectra/EVF_{}_{}_1Dspectrum_linewidths.png'.format(ID_num, EVF_filename), bbox_inches='tight')
 
         plt.show()
         return mu1, np.nan, A1, np.nan, sig1, np.nan  
@@ -188,7 +188,7 @@ EVF_linewidth_tab['sigma_2']   = sigma2_list
 EVF_linewidth_tab['FWHM_1']  = FWHM1_list
 EVF_linewidth_tab['FWHM_2']  = FWHM2_list
 
-EVF_linewidth_tab.write(basepath + 'spectra/EVF_linewidth_tab.tex', format = 'latex', overwrite=True)
+EVF_linewidth_tab.write(basepath + '/spectra/EVF_linewidth_tab.tex', format = 'latex', overwrite=True)
 
 
 ##Now make PVs for the other lines##
