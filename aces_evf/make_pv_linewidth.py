@@ -62,7 +62,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
     peaks, props = find_peaks(avg_subcube_spectrum, height=avg_subcube_spectrum.max().value/4, width=0.1)
 
     if len(peaks)>1: #for multi-peaks, just fit the top two
-        print("Double Peak")
+        print("EVF #", ID_num, "Double Peak")
         A0 = avg_subcube_spectrum[peaks][np.argsort(-props['peak_heights'])[0:2]]
         #mu0 = cube.spectral_axis[peaks][np.argsort(-props['peak_heights'])[0:2]] 
         #sig0 = props['widths'][np.argsort(-props['peak_heights'])[0:2]]
@@ -74,8 +74,12 @@ def fit_gaussians(cube, ID_num,EVF_filename):
 
         params0 = [mu0,A0,sig0]
         print(params0)
-        params,cov=curve_fit(double_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0.value[0],mu0.value[1],A0[0].value,A0[1].value,sig0[0],sig0[1]])
-
+        try:
+            params,cov=curve_fit(double_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0.value[0],mu0.value[1],A0[0].value,A0[1].value,sig0[0],sig0[1]],maxfev=1000000)
+        except RuntimeError:
+            print("No fitting found!")
+            return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
+        
         mu1,mu2,A1,A2,sig1,sig2 = params
         print('mu 1 = ',mu1,'mu 2 = ', mu2)
         print('sigma 1 = ',sig1,'sigma 2 = ', sig2)
@@ -95,11 +99,12 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         ax.set_ylabel('Jy/beam')
         plt.savefig(f'{basepath}/spectra/EVF_{ID_num}_{EVF_filename}_1Dspectrum_linewidths.png', bbox_inches='tight')
         plt.show()
+        plt.close()
         return mu1,mu2,A1,A2,sig1,sig2
  
     
     else: #for single peak, one gaussian is enough
-        print("Single Peak")
+        print("EVF #", ID_num, "Single Peak")
         A0 = max(avg_subcube_spectrum)
         #mu0 = cube.spectral_axis[peaks][np.argsort(-props['peak_heights'])[0]]
         #sig0 = props['widths'][np.argsort(-props['peak_heights'])[0]]
@@ -108,8 +113,12 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         sig0 = EVF_v_width[tab_ind]
         
         params0 = [mu0,A0,sig0]
-        params,cov=curve_fit(single_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0,sig0, A0.value])
-        mu1,sig1,A1 = params
+        try:
+            params,cov=curve_fit(single_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0,sig0, A0.value],maxfev=1000000)
+        except RuntimeError:
+            print("No fitting found!")
+            return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
+        
 
         print('mu 0 = ',mu0, 'mu 1 = ',mu1)
         print('A 0 = ',A0, 'A 1 = ',A1)
@@ -128,6 +137,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         plt.savefig(f'{basepath}/spectra/EVF_{ID_num}_{EVF_filename}_1Dspectrum_linewidths.png', bbox_inches='tight')
 
         plt.show()
+        plt.close()
         return mu1, np.nan, A1, np.nan, sig1, np.nan  
 
 
@@ -146,6 +156,12 @@ for file in glob.glob(CS_cubes_path + '*.fits', recursive=True):
     data.close()      
     cube.allow_huge_operations=True
     mu1,mu2,A1,A2,sig1,sig2 = fit_gaussians(cube, ID_num,EVF_filename)
+
+    if np.isnan(sig2) == 'none':
+        sigma1_list.append('NF')
+        sigma2_list.append('NF')
+        FWHM1_list.append('NF')
+        FWHM2_list.append('NF')
 
     if np.isnan(sig2) == False:
         FWHM_1, FWHM_2 = 2.355 * sig1, 2.355 * sig2
