@@ -76,6 +76,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         print(params0)
         params,cov=curve_fit(double_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0.value[0],mu0.value[1],A0[0].value,A0[1].value,sig0[0],sig0[1]])
 
+        print(ID_num, flush=True)
         mu1,mu2,A1,A2,sig1,sig2 = params
         print('mu 1 = ',mu1,'mu 2 = ', mu2)
         print('sigma 1 = ',sig1,'sigma 2 = ', sig2)
@@ -108,6 +109,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         sig0 = EVF_v_width[tab_ind]
         
         params0 = [mu0,A0,sig0]
+        print(ID_num, flush=True)
         params,cov=curve_fit(single_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0,sig0, A0.value])
         mu1,sig1,A1 = params
 
