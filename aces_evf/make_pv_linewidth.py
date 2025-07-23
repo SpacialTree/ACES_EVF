@@ -76,7 +76,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         print(params0)
         try:
             params,cov=curve_fit(double_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0.value[0],mu0.value[1],A0[0].value,A0[1].value,sig0[0],sig0[1]],maxfev=1000000)
-        except RuntimeError:
+        except:
             print("No fitting found!")
             return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
         
@@ -115,7 +115,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         params0 = [mu0,A0,sig0]
         try:
             params,cov=curve_fit(single_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0,sig0, A0.value],maxfev=1000000)
-        except RuntimeError:
+        except:
             print("No fitting found!")
             return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
         
