@@ -147,7 +147,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
 
 EVF_ID_list, sigma1_list, sigma2_list, FWHM1_list, FWHM2_list = [], [], [], [], []
 
-for file in glob.glob(CS_cubes_path + '*.fits', recursive=True):
+for file in glob.glob(CS_cubes_path + '/EVF_*_CS21_l*_b*.fits', recursive=True):
     CS_cube = file
     ID_num = os.path.basename(file).split('_',2)[1]
     EVF_filename = os.path.basename(file).split('_',2)[2].split('.fits',1)[0]
