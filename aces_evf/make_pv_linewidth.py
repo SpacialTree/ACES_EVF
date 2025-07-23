@@ -161,18 +161,21 @@ for file in glob.glob(CS_cubes_path + '/EVF_*_CS21_l*_b*.fits', recursive=True):
     mu1,mu2,A1,A2,sig1,sig2 = fit_gaussians(cube, ID_num,EVF_filename)
 
     if np.isnan(sig2) == 'none':
+        EVF_ID_list.append(ID_num)
         sigma1_list.append('NF')
         sigma2_list.append('NF')
         FWHM1_list.append('NF')
         FWHM2_list.append('NF')
 
     if np.isnan(sig2) == False:
+        EVF_ID_list.append(ID_num)
         FWHM_1, FWHM_2 = 2.355 * sig1, 2.355 * sig2
         sigma1_list.append(abs(np.round(sig1,3)))
         sigma2_list.append(abs(np.round(sig2,3)))
         FWHM1_list.append(abs(np.round(FWHM_1,3)))
         FWHM2_list.append(abs(np.round(FWHM_2,3)))
     else:
+        EVF_ID_list.append(ID_num)
         FWHM_1 = 2.355 * sig1
         sigma1_list.append(abs(np.round(sig1,3)))
         sigma2_list.append(str('-'))
