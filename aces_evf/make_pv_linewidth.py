@@ -121,6 +121,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
             print("No fitting found!")
             return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
 
+        mu1,mu2,A1,A2,sig1,sig2 = params
         print('mu 0 = ',mu0, 'mu 1 = ',mu1)
         print('A 0 = ',A0, 'A 1 = ',A1)
         print('sigma 0 = ',sig0, 'sigma 1 = ',sig1)
