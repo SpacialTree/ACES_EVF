@@ -74,6 +74,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
 
         params0 = [mu0,A0,sig0]
         print(params0)
+
         try:
             params,cov=curve_fit(double_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0.value[0],mu0.value[1],A0[0].value,A0[1].value,sig0[0],sig0[1]],maxfev=1000000)
         except:
@@ -113,13 +114,15 @@ def fit_gaussians(cube, ID_num,EVF_filename):
         sig0 = EVF_v_width[tab_ind]
         
         params0 = [mu0,A0,sig0]
+
         try:
             params,cov=curve_fit(single_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0,sig0, A0.value],maxfev=1000000)
         except:
             print("No fitting found!")
-            return mu1,A1,sig1 == 'none', 'none','none'
-        
 
+            return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
+
+        mu1,A1,sig1 = params
         print('mu 0 = ',mu0, 'mu 1 = ',mu1)
         print('A 0 = ',A0, 'A 1 = ',A1)
         print('sigma 0 = ',sig0, 'sigma 1 = ',sig1)
@@ -145,7 +148,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
 
 EVF_ID_list, sigma1_list, sigma2_list, FWHM1_list, FWHM2_list = [], [], [], [], []
 
-for file in glob.glob(CS_cubes_path + '*.fits', recursive=True):
+for file in glob.glob(CS_cubes_path + '/EVF_*_CS21_l*_b*.fits', recursive=True):
     CS_cube = file
     ID_num = os.path.basename(file).split('_',2)[1]
     EVF_filename = os.path.basename(file).split('_',2)[2].split('.fits',1)[0]
