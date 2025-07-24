@@ -77,7 +77,7 @@ def fit_gaussians(cube, ID_num,EVF_filename):
 
         try:
             params,cov=curve_fit(double_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0.value[0],mu0.value[1],A0[0].value,A0[1].value,sig0[0],sig0[1]],maxfev=1000000)
-        except RuntimeError:
+        except:
             print("No fitting found!")
             return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
         
@@ -117,11 +117,12 @@ def fit_gaussians(cube, ID_num,EVF_filename):
 
         try:
             params,cov=curve_fit(single_gauss,subcube.spectral_axis,avg_subcube_spectrum,p0=[mu0,sig0, A0.value],maxfev=1000000)
-        except RuntimeError:
+        except:
             print("No fitting found!")
+
             return mu1,mu2,A1,A2,sig1,sig2 == 'none', 'none','none','none','none','none'
 
-        mu1,A1,sig1 = params
+        mu1,sig1,A1 = params
         print('mu 0 = ',mu0, 'mu 1 = ',mu1)
         print('A 0 = ',A0, 'A 1 = ',A1)
         print('sigma 0 = ',sig0, 'sigma 1 = ',sig1)
@@ -160,18 +161,21 @@ for file in glob.glob(CS_cubes_path + '/EVF_*_CS21_l*_b*.fits', recursive=True):
     mu1,mu2,A1,A2,sig1,sig2 = fit_gaussians(cube, ID_num,EVF_filename)
 
     if np.isnan(sig2) == 'none':
+        EVF_ID_list.append(ID_num)
         sigma1_list.append('NF')
         sigma2_list.append('NF')
         FWHM1_list.append('NF')
         FWHM2_list.append('NF')
 
     if np.isnan(sig2) == False:
+        EVF_ID_list.append(ID_num)
         FWHM_1, FWHM_2 = 2.355 * sig1, 2.355 * sig2
         sigma1_list.append(abs(np.round(sig1,3)))
         sigma2_list.append(abs(np.round(sig2,3)))
         FWHM1_list.append(abs(np.round(FWHM_1,3)))
         FWHM2_list.append(abs(np.round(FWHM_2,3)))
     else:
+        EVF_ID_list.append(ID_num)
         FWHM_1 = 2.355 * sig1
         sigma1_list.append(abs(np.round(sig1,3)))
         sigma2_list.append(str('-'))
