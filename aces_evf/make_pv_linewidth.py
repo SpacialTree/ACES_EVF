@@ -55,6 +55,7 @@ def double_gauss(x,mu1,mu2,A1,A2,sig1,sig2):
 
 
 def fit_gaussians(cube, ID_num,EVF_filename):
+
     tab_ind = np.where(EVF_tab['ID Number'] == int(ID_num))[0][0]
     subcube = cube.spectral_slab(EVF_tab['min_v'][tab_ind]* u.km / u.s, EVF_tab['max_v'][tab_ind]* u.km / u.s)
     avg_spectrum = cube.mean(axis=(1,2))
@@ -165,7 +166,7 @@ for file in glob.glob(CS_cubes_path + '/EVF_*_CS21_l*_b*.fits', recursive=True):
         FWHM1_list.append('NF')
         FWHM2_list.append('NF')
 
-    if np.isnan(sig2) == False:
+    if not np.isnan(sig2):
         FWHM_1, FWHM_2 = 2.355 * sig1, 2.355 * sig2
         sigma1_list.append(abs(np.round(sig1,3)))
         sigma2_list.append(abs(np.round(sig2,3)))
