@@ -197,7 +197,7 @@ EVF_linewidth_tab['FWHM_2']  = FWHM2_list
 
 EVF_linewidth_tab.write(basepath + '/spectra/EVF_linewidth_tab.tex', format = 'latex', overwrite=True)
 
-
+'''
 ##Now make PVs for the other lines##
 for file in glob.glob(SiO_cubes_path + '*.fits', recursive=True):
     SiO_cube = file
@@ -222,3 +222,5 @@ for file in glob.glob(HC3N_cubes_path + '*.fits', recursive=True):
     data.close()      
     cube.allow_huge_operations=True   
     make_pv_plots(cube, ID_num,EVF_filename)
+
+'''
