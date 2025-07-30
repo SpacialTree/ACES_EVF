@@ -32,6 +32,8 @@ def main(line_list=['CS21'], mode=False):
 
     #regs = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
     tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
+    #Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/dubious_sources.csv')
+    #Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
     if not mode: 
         print('Processing all regions individually', flush=True)
         if len(line_list) > 1:
