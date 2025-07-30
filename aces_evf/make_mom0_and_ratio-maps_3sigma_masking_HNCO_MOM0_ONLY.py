@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-# In[1]:
-
 
 import os, glob
 from pathlib import Path
@@ -47,10 +43,6 @@ from spectral_cube import Projection
 
 from reproject import reproject_interp
 
-
-# In[2]:
-
-
 #Paths and definitions
 drivepath = '/orange/adamginsburg/ACES/mosaics/cubes/' #Data directory containing cubes
 mom0dir = '/orange/adamginsburg/ACES/broadline_sources/EVFs/moments/mom0_masked/'#Directory where mom0 maps are stored.
@@ -61,8 +53,6 @@ savedir_figure = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/masked
 #savedir_fits = '/Users/clairecook/CMZ-Central20pc/EVFs/DATATEST/RatioMaps-AltMasking/' #Directory where .fits ratio map figures will be saved
 
 
-# In[5]:
-
 
 EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 EVF_reg = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
@@ -72,10 +62,6 @@ EVF_reg = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_
 #EVF_tab.pprint_all() #prints ALL of the table without any truncation with ellipses
 
 #EVF_reg = Regions.read('/Users/clairecook/CMZ-Central20pc/EVFs/DATATEST/Identification/TILES_TABLES/EVF_reg_list.reg')
-
-
-# In[10]:
-
 
 vel_range_list = []
 delta_l_list  = []
@@ -95,9 +81,6 @@ for evf in EVF_tab:
     
 linetracers = ['HNCO_7m12mTP'] #which line to make mom0 maps for
 all_linetracers = ['CS21', 'H13CN', 'H13COp', 'SiO21', 'SO32', 'SO21', 'HN13C', 'HC3N', 'HNCO_7m12mTP'] #which lines to make line ratios for
-
-
-# In[7]:
 
 
 #Make and save moment 0 maps for all line tracers
@@ -131,10 +114,6 @@ for line in linetracers:
             mom0.write(mom0folder +f'/evf{evf_num[i]}_l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
             #mom0.write(mom0folder +f'/l{lb_list[i][0]}_b{lb_list[i][1]}_{line}mom0.fits', overwrite=True)
 
-
-# In[13]:
-
-
 #Gets lists of EVF names
 evf_source_names=[]
 lb_name_list=[]
@@ -147,10 +126,6 @@ for idx,lb in enumerate(lb_list):
     lb_name_list.append(lb_name)
     
 print(len(lb_name_list))
-
-
-# In[12]:
-
 
 #This will make and save line tracer ratio maps AS FITS FILES for all EVF sources
 noise_threshold=0.0 #mask absorption (anything below 0)
@@ -245,9 +220,6 @@ while s<len(evf_source_names): #Iterates through each source
     print("**************************************")
 
     s+=1
-
-
-# In[ ]:
 
 
 
