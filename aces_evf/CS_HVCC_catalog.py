@@ -14,10 +14,12 @@ from astrodendro.structure import Structure
 
 
 # Set up file paths: 
-tabfile = # Add by-eye ID table path+file name here
-cubefile = # Add high resolution CS cube path+file name here
-dendfile = # Add dendrogram path+file name here
-catfile = # Save Path + filename of the catalog 
+savepath = '/orange/adamginsburg/ACES/broadline_sources/EVFs/dendro/'
+cubepath = '/orange/adamginsburg/ACES/mosaics/cubes/'
+tabfile = '/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/HVCC_resampled_table.ecsv'# Add by-eye ID table path+file name here
+cubefile = cubepath+'CS21_CubeMosaic.fits'# Add high resolution CS cube path+file name here
+dendfile = savepath+'CS_HVCC_dendrogram_mv_100_ms_100_mp_1.fits'# Add dendrogram path+file name here
+catfile = savepath+'CS_HVCC_dendrogram_catalog.ecsv'# Save Path + filename of the catalog 
 
 # Grab the CS data cube:
 cube = SpectralCube.read(cubefile)
