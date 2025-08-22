@@ -54,7 +54,8 @@ savedir_figure = '/orange/adamginsburg/ACES/broadline_sources/EVFs/ratios/masked
 
 
 
-EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
+#EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv') # HVCC_resampled_subcube_regions.ecsv
+EVF_tab = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/HVCC_resampled_subcube_regions.ecsv')
 EVF_reg = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
 
 #EVF_tab = Table.read('/Users/clairecook/CMZ-Central20pc/EVFs/DATATEST/Identification/TILES_TABLES/Filtered_EVFs_table.ecsv')
