@@ -31,7 +31,8 @@ def main(line_list=['CS21'], mode=False):
             os.makedirs(line_dir)
 
     #regs = Regions.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/EVF_reg_list.reg')
-    tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
+    tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/HVCC_resampled_subcube_regions.ecsv')
+    #Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
     #Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/dubious_sources.csv')
     #Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
     if not mode: 
@@ -69,7 +70,6 @@ def main(line_list=['CS21'], mode=False):
                 fn = os.path.join(cube_mosaic_dir, f'{line}_CubeMosaic.fits')
                 print(f"Reading cube: {fn}", flush=True)
                 cube = SpectralCube.read(fn, use_dask=False)
-                #tbl = Table.read('/blue/adamginsburg/savannahgramze/ACES_EVF/aces_evf/Filtered_EVFs_table.ecsv')
 
                 print('Beginning to loop through individual fields to make and write subcubes.', flush=True)
                 for row in tbl: 
