@@ -18,4 +18,9 @@ authors:
     email: dani.lipman@uconn.edu
     affiliation: University of Connecticut
     orcid: 'https://orcid.org/0000-0002-5776-9473'
+  - given-names: Samantha
+    family-names: Adams
+    email: samantha.2.adams@uconn.edu
+    affiliation: University of Connecticut
+    orcid: 'https://orcid.org/0009-0003-6268-660X'
 repository-code: 'https://github.com/ACES-CMZ/ACES_EVF_HVCC'
