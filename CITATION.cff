@@ -23,4 +23,9 @@ authors:
     email: samantha.2.adams@uconn.edu
     affiliation: University of Connecticut
     orcid: 'https://orcid.org/0009-0003-6268-660X'
+  - given-names: Jennifer
+    family-names: Wallace
+    email: jennifer.2.wallace@uconn.edu
+    affiliation: University of Connecticut
+    orcid: 'https://orcid.org/0009-0002-7459-4174'
 repository-code: 'https://github.com/ACES-CMZ/ACES_EVF_HVCC'
