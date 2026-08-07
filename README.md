@@ -29,7 +29,7 @@ The code used for analysis is in the main aces_evf/ directory, including the fol
 
 **'oka_comp_table.ipynb'** : Comparison with Oka 2012 and Oka 2022 tables
 
-
+**'evfs_selected.ipynb'** : Used to create: average CS(2-1) spectrum, Position-Velocity Diagram in Galactic latitude and Galactic longitude, and Moment 0 map for selected EVFs.
 
 ## Other misc code used during paper sprint : 
 Histogram of Line Ratios PV 
