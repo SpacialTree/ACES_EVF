@@ -1,3 +1,5 @@
+![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=plastic)
+
 # ACES_EVF_HVCC
 This repository holds the analysis code used to search for and analyze High Velocity Compact Cloud candidates in the ACES CS (2-1) data.
 
